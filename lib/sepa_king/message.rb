@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module SEPA
   PAIN_008_001_02 = 'pain.008.001.02'
@@ -16,19 +16,24 @@ module SEPA
 
     validates_presence_of :transactions
     validate do |record|
-      record.errors.add(:account, record.account.errors.full_messages) unless record.account.valid?
+      unless record.account.valid?
+        record.errors.add(:account, record.account.errors.full_messages)
+      end
     end
 
     class_attribute :account_class, :transaction_class, :xml_main_tag, :known_schemas
 
-    def initialize(account_options={})
+    def initialize(account_options = {})
       @grouped_transactions = {}
       @account = account_class.new(account_options)
     end
 
     def add_transaction(options)
       transaction = transaction_class.new(options)
-      raise ArgumentError.new(transaction.errors.full_messages.join("\n")) unless transaction.valid?
+      unless transaction.valid?
+        raise ArgumentError, transaction.errors.full_messages.join("\n")
+      end
+
       @grouped_transactions[transaction_group(transaction)] ||= []
       @grouped_transactions[transaction_group(transaction)] << transaction
     end
@@ -38,9 +43,11 @@ module SEPA
     end
 
     # @return [String] xml
-    def to_xml(schema_name=self.known_schemas.first)
-      raise SEPA::Error.new(errors.full_messages.join("\n")) unless valid?
-      raise SEPA::Error.new("Incompatible with schema #{schema_name}!") unless schema_compatible?(schema_name)
+    def to_xml(schema_name = known_schemas.first)
+      raise SEPA::Error, errors.full_messages.join("\n") unless valid?
+      unless schema_compatible?(schema_name)
+        raise SEPA::Error, "Incompatible with schema #{schema_name}!"
+      end
 
       builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |builder|
         builder.Document(xml_schema(schema_name)) do
@@ -55,27 +62,33 @@ module SEPA
       builder.to_xml
     end
 
-    def amount_total(selected_transactions=transactions)
+    def amount_total(selected_transactions = transactions)
       selected_transactions.inject(0) { |sum, t| sum + t.amount }
     end
 
     def schema_compatible?(schema_name)
-      raise ArgumentError.new("Schema #{schema_name} is unknown!") unless self.known_schemas.include?(schema_name)
+      unless known_schemas.include?(schema_name)
+        raise ArgumentError, "Schema #{schema_name} is unknown!"
+      end
 
       case schema_name
-        when PAIN_001_002_03, PAIN_008_002_02, PAIN_001_001_03, PAIN_001_001_03_CH_02
-          account.bic.present? && transactions.all? { |t| t.schema_compatible?(schema_name) }
-        when PAIN_001_003_03, PAIN_008_003_02, PAIN_008_001_02
-          transactions.all? { |t| t.schema_compatible?(schema_name) }
+      when PAIN_001_002_03, PAIN_008_002_02, PAIN_001_001_03, PAIN_001_001_03_CH_02
+        account.bic.present? && transactions.all? { |t| t.schema_compatible?(schema_name) }
+      when PAIN_001_003_03, PAIN_008_003_02, PAIN_008_001_02
+        transactions.all? { |t| t.schema_compatible?(schema_name) }
       end
     end
 
     # Set unique identifer for the message
     def message_identification=(value)
-      raise ArgumentError.new('message_identification must be a string!') unless value.is_a?(String)
+      unless value.is_a?(String)
+        raise ArgumentError, 'message_identification must be a string!'
+      end
 
-      regex = /\A([A-Za-z0-9]|[\+|\?|\/|\-|\:|\(|\)|\.|\,|\'|\ ]){1,35}\z/
-      raise ArgumentError.new("message_identification does not match #{regex}!") unless value.match(regex)
+      regex = %r{\A([A-Za-z0-9]|[\+|\?|/|\-|\:|\(|\)|\.|\,|\'|\ ]){1,35}\z}
+      unless value.match(regex)
+        raise ArgumentError, "message_identification does not match #{regex}!"
+      end
 
       @message_identification = value
     end
@@ -88,10 +101,14 @@ module SEPA
     # Set creation date time for the message
     # p.s. Rabobank in the Netherlands only accepts the more restricted format [0-9]{4}[-][0-9]{2,2}[-][0-9]{2,2}[T][0-9]{2,2}[:][0-9]{2,2}[:][0-9]{2,2}
     def creation_date_time=(value)
-      raise ArgumentError.new('creation_date_time must be a string!') unless value.is_a?(String)
+      unless value.is_a?(String)
+        raise ArgumentError, 'creation_date_time must be a string!'
+      end
 
       regex = /[0-9]{4}[-][0-9]{2,2}[-][0-9]{2,2}(?:\s|T)[0-9]{2,2}[:][0-9]{2,2}[:][0-9]{2,2}/
-      raise ArgumentError.new("creation_date_time does not match #{regex}!") unless value.match(regex)
+      unless value.match(regex)
+        raise ArgumentError, "creation_date_time does not match #{regex}!"
+      end
 
       @creation_date_time = value
     end
@@ -115,18 +132,21 @@ module SEPA
       grouped_transactions.keys.collect { |group| payment_information_identification(group) }
     end
 
-  private
+    private
+
     # @return {Hash<Symbol=>String>} xml schema information used in output xml
     def xml_schema(schema_name)
-      return {
-        :xmlns                => "urn:iso:std:iso:20022:tech:xsd:#{schema_name}",
-        :'xmlns:xsi'          => 'http://www.w3.org/2001/XMLSchema-instance',
-        :'xsi:schemaLocation' => "urn:iso:std:iso:20022:tech:xsd:#{schema_name} #{schema_name}.xsd"
-      } unless schema_name == PAIN_001_001_03_CH_02
+      unless schema_name == PAIN_001_001_03_CH_02
+        return {
+          xmlns: "urn:iso:std:iso:20022:tech:xsd:#{schema_name}",
+          'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+          'xsi:schemaLocation': "urn:iso:std:iso:20022:tech:xsd:#{schema_name} #{schema_name}.xsd"
+        }
+      end
 
       {
-        xmlns:                'http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd',
-        'xmlns:xsi':          'http://www.w3.org/2001/XMLSchema-instance',
+        xmlns: 'http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd',
+        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
         'xsi:schemaLocation': 'http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd  pain.001.001.03.ch.02.xsd'
       }
     end
@@ -139,20 +159,22 @@ module SEPA
         builder.CtrlSum('%.2f' % amount_total)
         builder.InitgPty do
           builder.Nm(account.name)
-          builder.Id do
-            builder.OrgId do
-              builder.Othr do
-                builder.Id(account.creditor_identifier)
+          if account.respond_to? :creditor_identifier
+            builder.Id do
+              builder.OrgId do
+                builder.Othr do
+                  builder.Id(account.creditor_identifier)
+                end
               end
             end
-          end if account.respond_to? :creditor_identifier
+          end
         end
       end
     end
 
     # Unique and consecutive identifier (used for the <PmntInf> blocks)
     def payment_information_identification(group)
-      "#{message_identification}/#{grouped_transactions.keys.index(group)+1}"
+      "#{message_identification}/#{grouped_transactions.keys.index(group) + 1}"
     end
 
     # Returns a key to determine the group to which the transaction belongs
@@ -162,8 +184,10 @@ module SEPA
 
     def validate_final_document!(document, schema_name)
       xsd = Nokogiri::XML::Schema(File.read(File.expand_path("../../../lib/schema/#{schema_name}.xsd", __FILE__)))
-      errors = xsd.validate(document).map { |error| error.message }
-      raise SEPA::Error.new("Incompatible with schema #{schema_name}: #{errors.join(', ')}") if errors.any?
+      errors = xsd.validate(document).map(&:message)
+      if errors.any?
+        raise SEPA::Error, "Incompatible with schema #{schema_name}: #{errors.join(', ')}"
+      end
     end
   end
 end

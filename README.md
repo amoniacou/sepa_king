@@ -8,29 +8,25 @@
 
 We love building payment applications! So after developing the [DTAUS library for Ruby](https://github.com/salesking/king_dtaus) we move on with SEPA.
 
-
 ## Features
 
 This gem implements the following two messages out of the ISO 20022 standard:
 
-* Credit Transfer Initiation (`pain.001.003.03`, `pain.001.002.03` and `pain.001.001.03`)
-* Direct Debit Initiation (`pain.008.003.02`, `pain.008.002.02` and `pain.008.001.02`)
+- Credit Transfer Initiation (`pain.001.003.03`, `pain.001.002.03` and `pain.001.001.03`)
+- Direct Debit Initiation (`pain.008.003.02`, `pain.008.002.02` and `pain.008.001.02`)
 
 It handles the _Specification of Data Formats_ v2.7 (2013-11-04).
 
 BTW: **pain** is a shortcut for **Pa**yment **In**itiation.
 
-
 ## Requirements
 
-* Ruby 2.2 or newer
-* ActiveModel 3.1 or newer (including 6.0)
-
+- Ruby 2.5 or newer
+- ActiveModel 4.1 or newer (including 6.0)
 
 ## Installation
 
     gem install sepa_king
-
 
 ## Usage
 
@@ -53,7 +49,13 @@ sdd = SEPA::DirectDebit.new(
 
   # Creditor Identifier, in German: Gläubiger-Identifikationsnummer
   # String, max. 35 chars
-  creditor_identifier: 'DE98ZZZ09999999999'
+  creditor_identifier: 'DE98ZZZ09999999999',
+
+  # Country code
+  country_code: 'DE',
+
+  # Currency
+  currency: 'EUR'
 )
 
 # Second: Add transactions
@@ -127,7 +129,9 @@ sdd.add_transaction(
     name:                'Creditor Inc.',
     bic:                 'RABONL2U',
     iban:                'NL08RABO0135742099',
-    creditor_identifier: 'NL53ZZZ091734220000'
+    creditor_identifier:  'NL53ZZZ091734220000',
+    currency:            'EUR',
+    country_code:        'NL'
   )
 
   # OPTIONAL: Specify the country & address of the debtor (REQUIRED for SEPA debits outside of EU. The individually required fields depend on the target country)
@@ -149,7 +153,6 @@ sdd.add_transaction ...
 xml_string = sdd.to_xml # Use latest schema pain.008.003.02
 xml_string = sdd.to_xml('pain.008.002.02') # Use former schema pain.008.002.02
 ```
-
 
 How to create the XML for **Credit Transfer Initiation** (in German: "Überweisungen")
 
@@ -270,25 +273,22 @@ end
 **Beware:** The SEPA::IBANValidator is strict - e.g. it does not allow any spaces in the IBAN.
 
 Also see:
-* [lib/sepa_king/validator.rb](https://github.com/salesking/sepa_king/blob/master/lib/sepa_king/validator.rb)
-* [lib/sepa_king/transaction/direct_debit_transaction.rb](https://github.com/salesking/sepa_king/blob/master/lib/sepa_king/transaction/direct_debit_transaction.rb)
 
+- [lib/sepa_king/validator.rb](https://github.com/salesking/sepa_king/blob/master/lib/sepa_king/validator.rb)
+- [lib/sepa_king/transaction/direct_debit_transaction.rb](https://github.com/salesking/sepa_king/blob/master/lib/sepa_king/transaction/direct_debit_transaction.rb)
 
 ## Changelog
 
 https://github.com/salesking/sepa_king/releases
 
-
 ## Contributors
 
 https://github.com/salesking/sepa_king/graphs/contributors
 
-
 ## Resources
 
-* http://www.ebics.de/index.php?id=77
-* SalesKing: http://salesking.eu
-
+- http://www.ebics.de/index.php?id=77
+- SalesKing: http://salesking.eu
 
 ## License
 

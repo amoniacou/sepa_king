@@ -1,4 +1,5 @@
-# encoding: utf-8
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe SEPA::Converter do
@@ -41,11 +42,11 @@ describe SEPA::Converter do
   end
 
   describe :convert_decimal do
-    it "should convert Integer to BigDecimal" do
+    it 'should convert Integer to BigDecimal' do
       expect(convert_decimal(42)).to eq(BigDecimal('42.00'))
     end
 
-    it "should convert Float to BigDecimal" do
+    it 'should convert Float to BigDecimal' do
       expect(convert_decimal(42.12)).to eq(BigDecimal('42.12'))
     end
 

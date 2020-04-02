@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 unless defined?(ActiveModel::Model)
   # ActiveModel::Model is available since ActiveModel 4.0 only.
   #
@@ -14,10 +16,10 @@ unless defined?(ActiveModel::Model)
         end
       end
 
-      def initialize(params={})
-        params.each do |attr, value|
-          self.public_send("#{attr}=", value)
-        end if params
+      def initialize(params = {})
+        params&.each do |attr, value|
+          public_send("#{attr}=", value)
+        end
 
         super()
       end

@@ -1,11 +1,11 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module SEPA
   class DirectDebit < Message
     self.account_class = CreditorAccount
     self.transaction_class = DirectDebitTransaction
     self.xml_main_tag = 'CstmrDrctDbtInitn'
-    self.known_schemas = [ PAIN_008_003_02, PAIN_008_002_02, PAIN_008_001_02 ]
+    self.known_schemas = [PAIN_008_003_02, PAIN_008_002_02, PAIN_008_001_02]
 
     validate do |record|
       if record.transactions.map(&:local_instrument).uniq.size > 1
@@ -13,15 +13,15 @@ module SEPA
       end
     end
 
-  private
+    private
+
     # Find groups of transactions which share the same values of some attributes
     def transaction_group(transaction)
-      { requested_date:   transaction.requested_date,
+      { requested_date: transaction.requested_date,
         local_instrument: transaction.local_instrument,
-        sequence_type:    transaction.sequence_type,
-        batch_booking:    transaction.batch_booking,
-        account:          transaction.creditor_account || account
-      }
+        sequence_type: transaction.sequence_type,
+        batch_booking: transaction.batch_booking,
+        account: transaction.creditor_account || account }
     end
 
     def build_payment_informations(builder)
@@ -136,7 +136,9 @@ module SEPA
           builder.MndtRltdInf do
             builder.MndtId(transaction.mandate_id)
             builder.DtOfSgntr(transaction.mandate_date_of_signature.iso8601)
-            build_amendment_informations(builder, transaction) if transaction.amendment_informations?
+            if transaction.amendment_informations?
+              build_amendment_informations(builder, transaction)
+            end
           end
         end
         builder.DbtrAgt do

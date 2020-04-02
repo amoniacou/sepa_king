@@ -1,13 +1,16 @@
-# encoding: utf-8
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe SEPA::CreditorAccount do
   it 'should initialize a new account' do
     expect(
-      SEPA::CreditorAccount.new name:                'Gläubiger GmbH',
-                                bic:                 'BANKDEFFXXX',
-                                iban:                'DE87200500001234567890',
-                                creditor_identifier: 'DE98ZZZ09999999999'
+      SEPA::CreditorAccount.new(name: 'Gläubiger GmbH',
+                                bic: 'BANKDEFFXXX',
+                                iban: 'DE87200500001234567890',
+                                creditor_identifier: 'DE98ZZZ09999999999',
+                                country_code: 'DE',
+                                currency: 'EUR')
     ).to be_valid
   end
 

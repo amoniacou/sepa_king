@@ -1,8 +1,9 @@
-# encoding: utf-8
+# frozen_string_literal: true
+
 module SEPA
   class IBANValidator < ActiveModel::Validator
     # IBAN2007Identifier (taken from schema)
-    REGEX = /\A[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}\z/
+    REGEX = /\A[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}\z/.freeze
 
     def validate(record)
       field_name = options[:field_name] || :iban
@@ -16,7 +17,7 @@ module SEPA
 
   class BICValidator < ActiveModel::Validator
     # AnyBICIdentifier (taken from schema)
-    REGEX = /\A[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}\z/
+    REGEX = /\A[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}\z/.freeze
 
     def validate(record)
       field_name = options[:field_name] || :bic
@@ -31,7 +32,7 @@ module SEPA
   end
 
   class CreditorIdentifierValidator < ActiveModel::Validator
-    REGEX = /\A[a-zA-Z]{2,2}[0-9]{2,2}([A-Za-z0-9]|[\+|\?|\/|\-|\:|\(|\)|\.|,|']){3,3}([A-Za-z0-9]|[\+|\?|\/|\-|:|\(|\)|\.|,|']){1,28}\z/
+    REGEX = %r{\A[a-zA-Z]{2,2}[0-9]{2,2}([A-Za-z0-9]|[\+|\?|/|\-|\:|\(|\)|\.|,|']){3,3}([A-Za-z0-9]|[\+|\?|/|\-|:|\(|\)|\.|,|']){1,28}\z}.freeze
 
     def validate(record)
       field_name = options[:field_name] || :creditor_identifier
@@ -54,7 +55,7 @@ module SEPA
   end
 
   class MandateIdentifierValidator < ActiveModel::Validator
-    REGEX = /\A([A-Za-z0-9]|[\+|\?|\/|\-|\:|\(|\)|\.|\,|\']){1,35}\z/
+    REGEX = %r{\A([A-Za-z0-9]|[\+|\?|/|\-|\:|\(|\)|\.|\,|\']){1,35}\z}.freeze
 
     def validate(record)
       field_name = options[:field_name] || :mandate_id

@@ -1,4 +1,5 @@
-# encoding: utf-8
+# frozen_string_literal: true
+
 module SEPA
   class Transaction
     include ActiveModel::Validations
@@ -29,8 +30,8 @@ module SEPA
     validates_length_of :remittance_information, within: 1..140, allow_nil: true
     validates_numericality_of :amount, greater_than: 0
     validates_presence_of :requested_date
-    validates_inclusion_of :batch_booking, :in => [true, false]
-    validates_with BICValidator, IBANValidator, message: "%{value} is invalid"
+    validates_inclusion_of :batch_booking, in: [true, false]
+    validates_with BICValidator, IBANValidator, message: '%{value} is invalid'
 
     def initialize(attributes = {})
       attributes.each do |name, value|
@@ -39,7 +40,7 @@ module SEPA
 
       self.requested_date ||= DEFAULT_REQUESTED_DATE
       self.reference ||= 'NOTPROVIDED'
-      self.batch_booking = true if self.batch_booking.nil?
+      self.batch_booking = true if batch_booking.nil?
       self.currency ||= 'EUR'
     end
 
