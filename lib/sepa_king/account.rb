@@ -13,7 +13,7 @@ module SEPA
     validates_length_of :name, within: 1..70
     validates_with BICValidator, IBANValidator, message: '%{value} is invalid'
     validates_inclusion_of :charge_bearer, in: ALLOWED_CHARGES, allow_nil: true
-    validates_presence_of :country_code, :currency, :creditor_identifier
+    validates_presence_of :currency, if: -> { iban.present? }
 
     def initialize(attributes = {})
       attributes.each do |name, value|

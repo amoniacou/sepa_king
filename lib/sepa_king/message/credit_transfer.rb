@@ -46,12 +46,14 @@ module SEPA
             builder.PstlAdr do
               builder.Ctry(account.country_code)
             end
-            builder.Id do
-              builder.OrgId do
-                builder.Othr do
-                  builder.Id(account.creditor_identifier)
-                  builder.SchmeNm do
-                    builder.Cd('BANK')
+            if account.respond_to? :creditor_identifier
+              builder.Id do
+                builder.OrgId do
+                  builder.Othr do
+                    builder.Id(account.creditor_identifier)
+                    builder.SchmeNm do
+                      builder.Cd('BANK')
+                    end
                   end
                 end
               end
