@@ -58,7 +58,7 @@ describe SEPA::Message do
       it 'should accept valid ID' do
         ['gid://myMoneyApp/Payment/15108', # for example, Rails Global ID could be a candidate
          Time.now.to_f.to_s # or a time based string
-].each do |valid_msgid|
+        ].each do |valid_msgid|
           subject.message_identification = valid_msgid
           expect(subject.message_identification).to eq(valid_msgid)
         end
@@ -69,7 +69,7 @@ describe SEPA::Message do
          '',                  # blank string
          'üöäß',              # non-ASCII chars
          '1' * 36             # too long
-].each do |arg|
+        ].each do |arg|
           expect do
             subject.message_identification = arg
           end.to raise_error(ArgumentError)

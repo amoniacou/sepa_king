@@ -14,6 +14,7 @@ module SEPA
                   :instruction,
                   :reference,
                   :remittance_information,
+                  :remittance_information_code,
                   :requested_date,
                   :batch_booking,
                   :currency,

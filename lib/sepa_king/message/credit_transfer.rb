@@ -153,7 +153,20 @@ module SEPA
         end
         if transaction.remittance_information
           builder.RmtInf do
-            builder.Ustrd(transaction.remittance_information)
+            if transaction.remittance_information_code
+              builder.Strd do
+                builder.CdtrRefInf do
+                  builder.Tp do
+                    builder.CdOrPrtry do
+                      builder.Cd(transaction.remittance_information_code)
+                    end
+                  end
+                  builder.Ref(transaction.remittance_information)
+                end
+              end
+            else
+              builder.Ustrd(transaction.remittance_information)
+            end
           end
         end
       end
